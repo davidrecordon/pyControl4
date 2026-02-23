@@ -209,13 +209,13 @@ class C4Websocket:
         if self.session is not None:
             # Create a new session using the caller's connector so engineio
             # can safely close it in _reset() without affecting the caller's
-            # session.
+            # session.  Setting ssl_verify=True prevents engineio from
+            # creating its own no-verify SSLContext, allowing the
+            # connector's SSL configuration to take effect.
             http_session = aiohttp.ClientSession(
                 connector=self.session.connector, connector_owner=False
             )
-            self._sio = socketio.AsyncClient(
-                ssl_verify=False, http_session=http_session
-            )
+            self._sio = socketio.AsyncClient(ssl_verify=True, http_session=http_session)
         else:
             self._sio = socketio.AsyncClient(ssl_verify=False)
         self._sio.register_namespace(
